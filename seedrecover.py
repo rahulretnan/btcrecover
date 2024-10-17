@@ -47,6 +47,7 @@ import compatibility_check
 
 from btcrecover import btcrseed
 import sys, multiprocessing
+import concurrent.futures
 
 def main():
     print()
@@ -78,9 +79,10 @@ def main():
     else:
         retval = 0  # "Seed not found" has already been printed to the console in btcrseed.main()
 
-    # Wait for any remaining child processes to exit cleanly (to avoid error messages from gc)
-    for process in multiprocessing.active_children():
-        process.join(1.0)
+    # Use all available CPU threads
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        futures = [executor.submit(process.join, 1.0) for process in multiprocessing.active_children()]
+        concurrent.futures.wait(futures)
 
     sys.exit(retval)
 

@@ -49,10 +49,19 @@ hiddenimports = [
 
 # Function to find .so files
 def find_so_file(name):
-    for root, dirs, files in os.walk('/usr/lib'):
-        for file in files:
-            if name in file and file.endswith('.so'):
-                return os.path.join(root, file)
+    # Paths to search
+    search_paths = [
+        os.getcwd(),  # Current directory
+        os.path.join(os.getcwd(), '.venv', 'lib'),  # Virtual environment lib directory
+        '/usr/lib'  # System lib directory
+    ]
+    
+    for path in search_paths:
+        for root, dirs, files in os.walk(path):
+            for file in files:
+                if name in file and file.endswith('.so'):
+                    return os.path.join(root, file)
+    
     return None
 
 # Find the required .so files

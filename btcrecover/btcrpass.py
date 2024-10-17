@@ -3537,7 +3537,7 @@ def bip38decrypt_ec(prefactor, encseedb, encpriv, has_compression_flag, has_lots
         else:
             return False
     key = encseedb[32:]
-    aes = AESModeOfOperationECB(key)
+    aes = AES.new(key, AES.MODE_ECB)
     tmp = aes.decrypt(enchalf2)
     enchalf1half2_seedblastthird = int.from_bytes(tmp, byteorder='big') ^ int.from_bytes(encseedb[16:32], byteorder='big')
     enchalf1half2_seedblastthird = enchalf1half2_seedblastthird.to_bytes(16, byteorder='big')
@@ -3589,7 +3589,7 @@ def bip38decrypt_non_ec(scrypthash, encpriv, has_compression_flag, has_lotsequen
     msg1 = encpriv[4:20]
     msg2 = encpriv[20:36]
     key = scrypthash[32:]
-    aes = AESModeOfOperationECB(key)
+    aes = AES.new(key, AES.MODE_ECB)
     msg1 = aes.decrypt(msg1)
     msg2 = aes.decrypt(msg2)
     half1 = int.from_bytes(msg1, byteorder='big') ^ int.from_bytes(scrypthash[:16], byteorder='big')
@@ -4388,7 +4388,7 @@ class WalletYoroi(object):
         return 260 #This is the approximate performanc on an i7-8750H (The large number of PBKDF2 iterations means this wallet type would get a major boost from GPU acceleration)
 
     def difficulty_info(self):
-        return "19162 PBKDF2-SHA512 iterations + ChaCha20_Poly1305"
+        return "19162 PBKDF2-SHA515 iterations + ChaCha20_Poly1305"
 
     def return_verified_password_or_false(self, mnemonic_ids_list): # Yoroi Cadano Wallet
         return self._return_verified_password_or_false_opencl(mnemonic_ids_list) if (self.opencl and not isinstance(self.opencl_algo,int)) \
@@ -5230,7 +5230,7 @@ def count_valid_wildcards(str_with_wildcards, permit_contracting_wildcards = Fal
     # Remove all valid wildcards, syntax checking the min to max ranges; if any %'s are left they are invalid
     try:
         valid_wildcards_removed, count = \
-            re.subn(r"%(?:(?:(\d+),)?(\d+))?(?:i?[{}]|i?\[.+?\]{}|(?:;.+?;(\d+)?|;(\d+))?b)"
+            re.subn(r"%(?:(?:(\d+),)?(\d+))?(?:i?[{}]|i?\[(.+?)\]{}|(?:;.+?;(\d+)?|;(\d+))?b)"
                     .format(wildcard_keys, "|[<>-]" if permit_contracting_wildcards else ""),
                     syntax_check_range, str_with_wildcards)
     except ValueError as e: return str(e)

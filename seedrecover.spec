@@ -50,8 +50,8 @@ a = Analysis(
     ['seedrecover.py'],
     pathex=['.'],  # Added current directory to pathex
     binaries=[
-        ('/Users/rahulretnan/Projects/Playground/btcrecover/.venv/lib/python3.12/site-packages/Crypto/Cipher/_raw_ecb.abi3.so', 'Crypto/Cipher'),
-        # Add paths to other required .so files if necessary
+       # ('/Users/rahulretnan/Projects/Playground/btcrecover/.venv/lib/python3.12/site-packages/Crypto/Cipher/_raw_ecb.abi3.so', 'Crypto/Cipher'),
+        ('/home/rahulretnan/projects/client/btcrecover/.venv/lib/python3.12/site-packages/Crypto/Cipher/_raw_ecb.abi3.so', 'Crypto/Cipher'),
     ],
     datas=datas,  # Included all necessary project files
     hiddenimports=hiddenimports,  # Added hidden imports
