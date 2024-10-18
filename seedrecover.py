@@ -2,6 +2,7 @@
 
 import locale
 import os
+import time
 
 # Try to set the locale to C.UTF-8
 try:
@@ -50,6 +51,8 @@ import sys, multiprocessing
 import concurrent.futures
 
 def main():
+    start_time = time.time()  # Record the start time
+
     print()
     print("Starting", btcrseed.full_version())
 
@@ -84,8 +87,12 @@ def main():
         futures = [executor.submit(process.join, 1.0) for process in multiprocessing.active_children()]
         concurrent.futures.wait(futures)
 
+    end_time = time.time()  # Record the end time
+    total_time = end_time - start_time
+    print(f"\nTotal execution time: {total_time:.2f} seconds")
+
     sys.exit(retval)
 
 if __name__ == "__main__":
-    multiprocessing.freeze_support()  # Add this line
+    multiprocessing.freeze_support()
     main()
