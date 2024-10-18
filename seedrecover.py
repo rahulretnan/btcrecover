@@ -3,6 +3,7 @@
 import locale
 import os
 import time
+import logging
 
 # Try to set the locale to C.UTF-8
 try:
@@ -50,18 +51,26 @@ from btcrecover import btcrseed
 import sys, multiprocessing
 import concurrent.futures
 
+# Configure logging
+logging.basicConfig(filename='execution.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 def main():
     start_time = time.time()  # Record the start time
+    logging.info("Execution started")
 
     print()
     print("Starting", btcrseed.full_version())
+    logging.info(f"Starting {btcrseed.full_version()}")
 
     btcrseed.register_autodetecting_wallets()
     mnemonic_sentence, path_coin = btcrseed.main(sys.argv[1:])
 
+    result = ""
     if mnemonic_sentence:
         if not btcrseed.tk_root:  # if the GUI is not being used
             print("Seed found:", mnemonic_sentence)  # never dies from printing Unicode
+            logging.info(f"Seed found: {mnemonic_sentence}")
+            result = f"Seed found: {mnemonic_sentence}"
 
         # Save the mnemonic sentence to a file
         with open("seed.txt", "w", encoding="utf-8") as file:
@@ -70,6 +79,7 @@ def main():
         # print this if there's any chance of Unicode-related display issues
         if any(ord(c) > 126 for c in mnemonic_sentence):
             print("HTML Encoded Seed:", mnemonic_sentence.encode("ascii", "xmlcharrefreplace").decode())
+            logging.info(f"HTML Encoded Seed: {mnemonic_sentence.encode('ascii', 'xmlcharrefreplace').decode()}")
 
         if btcrseed.tk_root:  # if the GUI is being used
             btcrseed.show_mnemonic_gui(mnemonic_sentence, path_coin)
@@ -78,9 +88,13 @@ def main():
 
     elif mnemonic_sentence is None:
         retval = 1  # An error occurred or Ctrl-C was pressed inside btcrseed.main()
+        logging.error("An error occurred or Ctrl-C was pressed inside btcrseed.main()")
+        result = "An error occurred or Ctrl-C was pressed inside btcrseed.main()"
 
     else:
         retval = 0  # "Seed not found" has already been printed to the console in btcrseed.main()
+        logging.info("Seed not found")
+        result = "Seed not found"
 
     # Use all available CPU threads
     num_workers = multiprocessing.cpu_count()  # Set the number of workers to the number of CPU threads
@@ -91,6 +105,14 @@ def main():
     end_time = time.time()  # Record the end time
     total_time = end_time - start_time
     print(f"\nTotal execution time: {total_time:.2f} seconds")
+    logging.info(f"Total execution time: {total_time:.2f} seconds")
+
+    # Create a report file
+    with open("execution_report.txt", "w", encoding="utf-8") as report_file:
+        report_file.write(f"Execution started: {time.ctime(start_time)}\n")
+        report_file.write(f"Execution ended: {time.ctime(end_time)}\n")
+        report_file.write(f"Total execution time: {total_time:.2f} seconds\n")
+        report_file.write(f"Result: {result}\n")
 
     sys.exit(retval)
 
