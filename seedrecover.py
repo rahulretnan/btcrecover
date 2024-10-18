@@ -83,7 +83,8 @@ def main():
         retval = 0  # "Seed not found" has already been printed to the console in btcrseed.main()
 
     # Use all available CPU threads
-    with concurrent.futures.ProcessPoolExecutor() as executor:
+    num_workers = multiprocessing.cpu_count()  # Set the number of workers to the number of CPU threads
+    with concurrent.futures.ProcessPoolExecutor(max_workers=num_workers) as executor:
         futures = [executor.submit(process.join, 1.0) for process in multiprocessing.active_children()]
         concurrent.futures.wait(futures)
 

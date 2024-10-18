@@ -22,4 +22,4 @@ build/
 
 # Ignore log files
 possible_passwords.log
-seeds.txt
+seed.txt
